@@ -5,6 +5,7 @@ grails.project.test.reports.dir = "target/test-reports"
 grails.project.work.dir = "target/work"
 grails.project.target.level = 1.6
 grails.project.source.level = 1.6
+grails.server.port.http = 8090
 //grails.project.war.file = "target/${appName}-${appVersion}.war"
 
 grails.project.fork = [
@@ -51,14 +52,20 @@ grails.project.dependency.resolution = {
         // runtime 'mysql:mysql-connector-java:5.1.27'
         // runtime 'org.postgresql:postgresql:9.3-1100-jdbc41'
     }
+    
+   
 
     plugins {
         // plugins for the build system only
-        // build ":tomcat:7.0.50.1"
+        //build ":tomcat:7.0.50.1"
         build ':jetty:2.0.3'
+        build ":extended-dependency-manager:0.5.5"
+
         // plugins for the compile step
         compile ":scaffolding:2.0.2"
         compile ':cache:1.1.1'
+        compile ":jquery-ui:1.10.3"
+ 
 
         // plugins needed at runtime but not for compilation
         runtime ":hibernate:3.6.10.8" // or ":hibernate4:4.3.1.1"
@@ -77,6 +84,10 @@ grails.project.dependency.resolution = {
         //compile ":sass-asset-pipeline:1.5.1"
         //compile ":less-asset-pipeline:1.5.0"
         //compile ":coffee-asset-pipeline:1.5.0"
-        //compile ":handlebars-asset-pipeline:1.0.0.3"
-    }
+        //compile ":handlebars-asset-pipeline:1.0.0.3"       
+    }         
+    
+   
 }
+
+

@@ -1,0 +1,36 @@
+02-27 10:30:03 jdbc[11]: exception
+org.h2.jdbc.JdbcSQLException: Table "CLOCK_EVENT_TRANS" not found; SQL statement:
+alter table clock_event_trans drop constraint FK50AF821246794B0A [42102-173]
+02-27 10:30:03 jdbc[11]: exception
+org.h2.jdbc.JdbcSQLException: Table "CLOCK_EVENT_TRANS" not found; SQL statement:
+alter table clock_event_trans drop constraint FK50AF8212F3A1D05 [42102-173]
+02-27 10:30:03 jdbc[11]: exception
+org.h2.jdbc.JdbcSQLException: Table "CLOCK_EVENT_TRANS" not found; SQL statement:
+alter table clock_event_trans drop constraint FK50AF82121D70E827 [42102-173]
+02-27 10:30:03 jdbc[11]: exception
+org.h2.jdbc.JdbcSQLException: Table "EMPLOYEE_POSITION" not found; SQL statement:
+alter table employee_position drop constraint FKD6A2879AC4339247 [42102-173]
+02-27 10:30:03 jdbc[11]: exception
+org.h2.jdbc.JdbcSQLException: Table "EMPLOYEE_POSITION" not found; SQL statement:
+alter table employee_position drop constraint FKD6A2879A13ABE6DC [42102-173]
+02-27 10:30:03 jdbc[11]: exception
+org.h2.jdbc.JdbcSQLException: Table "EMPLOYEE_PRIVILEGE" not found; SQL statement:
+alter table employee_privilege drop constraint FK39E8D660D057B08D [42102-173]
+02-27 10:30:03 jdbc[11]: exception
+org.h2.jdbc.JdbcSQLException: Table "EMPLOYEE_PRIVILEGE" not found; SQL statement:
+alter table employee_privilege drop constraint FK39E8D660BA0162A2 [42102-173]
+02-27 10:30:03 jdbc[11]: exception
+org.h2.jdbc.JdbcSQLException: Table "S3CRE3T" not found; SQL statement:
+alter table s3cre3t drop constraint FK201C30D71D70E827 [42102-173]
+02-27 10:30:03 jdbc[11]: exception
+org.h2.jdbc.JdbcSQLException: Table "SHIFT" not found; SQL statement:
+alter table shift drop constraint FK6856C82C4339247 [42102-173]
+02-27 10:30:03 jdbc[11]: exception
+org.h2.jdbc.JdbcSQLException: Table "SHIFT" not found; SQL statement:
+alter table shift drop constraint FK6856C821D70E827 [42102-173]
+02-27 10:30:03 jdbc[11]: exception
+org.h2.jdbc.JdbcSQLException: Table "TIME_OFF" not found; SQL statement:
+alter table time_off drop constraint FK843300FD7D6FFCAD [42102-173]
+02-27 10:30:03 jdbc[11]: exception
+org.h2.jdbc.JdbcSQLException: Table "TIME_OFF" not found; SQL statement:
+alter table time_off drop constraint FK843300FD1D70E827 [42102-173]

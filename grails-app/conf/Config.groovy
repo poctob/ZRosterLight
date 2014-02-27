@@ -45,6 +45,8 @@ grails.views.default.codec = "html"
 // If unspecified, controllers are prototype scoped.
 grails.controllers.defaultScope = 'singleton'
 
+grails.resources.debug = true
+
 // GSP settings
 grails {
     views {
@@ -112,6 +114,4 @@ log4j = {
            'org.springframework',
            'org.hibernate',
            'net.sf.ehcache.hibernate'
-    
-    info 'org.eclipse.jetty'
 }
