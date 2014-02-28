@@ -8,7 +8,7 @@ import grails.transaction.Transactional
 @Transactional(readOnly = true)
 class ConfigurationController {
 
-    static allowedMethods = [save: "POST", update: "PUT", delete: "DELETE"]
+    static allowedMethods = [save: "POST", update: "PUT", delete: "DELETE", saveAjax: "POST"]
 
     def index(Integer max) {
         params.max = Math.min(max ?: 10, 100)
@@ -44,6 +44,26 @@ class ConfigurationController {
             }
             '*' { respond configurationInstance, [status: CREATED] }
         }
+    }
+    
+    @Transactional
+    def saveAjax(Configuration configurationInstance) {
+        if (configurationInstance == null) {
+            notFound()
+            return
+        }
+
+        if (configurationInstance.hasErrors()) {
+            respond configurationInstance.errors, view:'index'
+            return
+        }
+
+        configurationInstance.save flush:true
+        
+        flash.message = "Item created!"
+        
+        render (template:'dataTableConfiguration', 
+            model:[configurationInstanceList:Configuration.list()])
     }
 
     def edit(Configuration configurationInstance) {
