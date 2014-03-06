@@ -11,8 +11,16 @@ class ConfigurationController {
     static allowedMethods = [save: "POST", update: "PUT", delete: "DELETE"]
 
     def index(Integer max) {
-        params.max = Math.min(max ?: 10, 100)
-        respond Configuration.list(params), model:[configurationInstanceCount: Configuration.count()]
+        params.max = Math.min(max ?: 5, 100)
+        render( view: "index",  
+        model:[
+            configurationInstanceList: Configuration.list(params),
+            configurationInstanceCount: Configuration.count(),
+            privilegeInstanceList: Privilege.list(params),
+            privilegeInstanceCount: Privilege.count()
+        ])        
+       
+        
     }
 
     def show(Configuration configurationInstance) {
@@ -45,6 +53,21 @@ class ConfigurationController {
             '*' { respond configurationInstance, [status: CREATED] }
         }
     }
+    
+     @Transactional
+     def saveConfigurationAjax(Configuration configurationInstance)
+     {
+         if (configurationInstance == null) {
+            notFound()
+            return
+        }
+        
+        configurationInstance.save flush:true
+        
+        render (template: "dataTableConfig", 
+            model: [configurationInstanceList: Configuration.list()])
+     }
+    
 
     def edit(Configuration configurationInstance) {
         respond configurationInstance
