@@ -16,6 +16,16 @@
             </ul>
         </div>
 
+  <div class="nav" role="navigation">
+    <g:link class="create" action="create"><g:message code="default.new.label" args="['']" /></g:link>
+  </div>
+  <div id="list-configuration" class="content scaffold-list" role="main">           
+    <g:if test="${flash.message}">
+      <div class="message" role="status">${flash.message}</div>
+    </g:if>
+    <div id="dataTable">
+      <g:render template="dataTableConfiguration"/>
+    </div>
 
         <div id="accordion">
             <h3><g:message code="default.list.label" args="[entityName]" /></h3>

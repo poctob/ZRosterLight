@@ -22,7 +22,7 @@
     <r:require module="jquery-ui"/>                
     <r:layoutResources />
 
-    <jqui:resources theme="trontastic" />
+   
     <script type="text/javascript">
         $(document).ready(function()
         {
