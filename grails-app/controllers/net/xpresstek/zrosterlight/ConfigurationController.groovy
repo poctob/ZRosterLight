@@ -10,10 +10,9 @@ class ConfigurationController {
 
     static allowedMethods = [
         save: "POST", 
-        update: "PUT", 
-        delete: "DELETE", 
-        saveConfigurationAjax: "POST",
-        updateConfigurationAjax: "POST"]
+        delete: "POST", 
+        saveConfigurationAjax: "POST"
+    ]
 
     def index(Integer max) {
         params.max = Math.min(max ?: 5, 100)
@@ -27,39 +26,6 @@ class ConfigurationController {
        
         
     }
-
-    def show(Configuration configurationInstance) {
-        respond configurationInstance
-    }
-
-    def create() {
-        respond new Configuration(params)
-    }
-
-    @Transactional
-    def save(Configuration configurationInstance) {
-        if (configurationInstance == null) {
-            notFound()
-            return
-        }
-
-        if (configurationInstance.hasErrors()) {
-            respond configurationInstance.errors, view:'create'
-            return
-        }
-
-        configurationInstance.save flush:true
-
-        request.withFormat {
-            form multipartForm {
-                flash.message = message(code: 'default.created.message', 
-                    args: [message(code: 'configurationInstance.label', 
-                        default: 'Configuration'), configurationInstance.id])
-                redirect configurationInstance
-            }
-            '*' { respond configurationInstance, [status: CREATED] }
-        }
-    }
     
     @Transactional
     def saveConfigurationAjax(Configuration configurationInstance)
@@ -71,19 +37,9 @@ class ConfigurationController {
         
         configurationInstance.save flush:true
         
-        flash.message = "Item created!"
+        flash.message = "Item processed!"
         renderConfigTable();
         
-    }
-    
-    def updateConfigurationAjax(Configuration configurationInstance)
-    {
-        if (configurationInstance == null) {
-            notFound()
-            return
-        }
-        
-          render (template:'form',model:[configurationInstanceList:Configuration.list()])        
     }
     
     def renderConfigTable()
@@ -99,36 +55,21 @@ class ConfigurationController {
                 configurationInstanceCount: Configuration.count()] 
         )
     }
-    def edit(Configuration configurationInstance) {
-        respond configurationInstance
-    }
-
-    @Transactional
-    def update(Configuration configurationInstance) {
+    def edit(int identity) {
+        def configurationInstance = Configuration.get(identity);
         if (configurationInstance == null) {
             notFound()
             return
         }
-
-        if (configurationInstance.hasErrors()) {
-            respond configurationInstance.errors, view:'edit'
-            return
-        }
-
-        configurationInstance.save flush:true
-
-        request.withFormat {
-            form multipartForm {
-                flash.message = message(code: 'default.updated.message', args: [message(code: 'Configuration.label', default: 'Configuration'), configurationInstance.id])
-                redirect configurationInstance
-            }
-            '*'{ respond configurationInstance, [status: OK] }
-        }
+        
+        render (template:'form', 
+            model:[configurationInstance:configurationInstance] )
     }
 
     @Transactional
-    def delete(Configuration configurationInstance) {
+    def delete(int identity) {
 
+        def configurationInstance = Configuration.get(identity);
         if (configurationInstance == null) {
             notFound()
             return

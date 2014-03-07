@@ -608,3 +608,69 @@ a.skip {
     position: absolute;
     left: -9999px;
 }
+
+/* ACTION BUTTONS INLINE*/
+
+.buttonsInLine {
+    overflow: hidden;
+    margin: 0.1em 0 0 0;
+    border: none;
+}
+
+.buttonsInLine input,
+.buttonsInLine a {
+    background-color: transparent;
+    border: 0;
+    color: #666666;
+    cursor: pointer;
+    display: inline-block;
+    margin: 0 0.25em 0;
+    overflow: visible;
+    padding: 0.25em 0.7em;
+    text-decoration: none;
+
+    -moz-border-radius: 0.3em;
+    -webkit-border-radius: 0.3em;
+    border-radius: 0.3em;
+}
+
+.buttonsInLine input:hover, .buttonsInLine input:focus,
+.buttonsInLine a:hover, .buttonsInLine a:focus {
+    background-color: #999999;
+    color: #ffffff;
+    outline: none;
+    text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.8);
+    -moz-box-shadow: none;
+    -webkit-box-shadow: none;
+    box-shadow: none;
+}
+
+.no-borderradius .buttonsInLine input:hover, .no-borderradius .buttonsInLine input:focus,
+.no-borderradius .buttonsInLine a:hover, .no-borderradius .buttonsInLine a:focus {
+    background-color: transparent;
+    color: #444444;
+    text-decoration: underline;
+}
+
+.buttonsInLine .delete, .buttonsInLine .edit, .buttonsInLine .save {
+    background-position: 0.7em center !important;
+    background-repeat: no-repeat !important;
+    text-indent: 25px !important;
+}
+
+.ie6 .buttonsInLine input.delete, .ie6 .buttonsInLine input.edit, .ie6 .buttonsInLine input.save,
+.ie7 .buttonsInLine input.delete, .ie7 .buttonsInLine input.edit, .ie7 .buttonsInLine input.save {
+    padding-left: 36px;
+}
+
+.buttonsInLine .delete {
+    background-image: url(../images/skin/database_delete.png);
+}
+
+.buttonsInLine .edit {
+    background-image: url(../images/skin/database_edit.png);
+}
+
+.buttonsInLine .save {
+    background-image: url(../images/skin/database_save.png) !important;
+}
