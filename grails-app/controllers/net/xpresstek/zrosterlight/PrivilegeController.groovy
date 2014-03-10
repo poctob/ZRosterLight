@@ -8,11 +8,44 @@ import grails.transaction.Transactional
 @Transactional(readOnly = true)
 class PrivilegeController {
 
-    static allowedMethods = [save: "POST", update: "PUT", delete: "DELETE"]
+    static allowedMethods = [
+        save: "POST", 
+        delete: "POST", 
+        saveConfigurationAjax: "POST"
+    ]
 
     def index(Integer max) {
         params.max = Math.min(max ?: 10, 100)
         respond Privilege.list(params), model:[privilegeInstanceCount: Privilege.count()]
+    }
+    
+    @Transactional
+    def saveConfigurationAjax(Privilege privilegeInstance)
+    {
+        if (privilegeInstance == null) {
+            notFound()
+            return
+        }
+        
+        privilegeInstance.save flush:true
+        
+        flash.message = "Item processed!"
+        renderConfigTable();
+        
+    }
+    
+    def renderConfigTable()
+    {
+        int lastpage = (int)(Privilege.count()/10)
+        lastpage*=10
+
+        params.max = 10
+        params.offset = lastpage
+        params.action = "index"
+        render (template:'/configuration/dataTablePrivilege', 
+            model:[privilegeInstanceList:Privilege.list(params),
+                privilegeInstanceCount: Privilege.count()] 
+        )
     }
 
     def show(Privilege privilegeInstance) {
@@ -20,7 +53,9 @@ class PrivilegeController {
     }
 
     def create() {
-        respond new Privilege(params)
+       def privilegeInstance = new Privilege(params);
+       render (template:'/configuration/editPrivilegeForm',  
+            model:[privilegeInstance:privilegeInstance])
     }
 
     @Transactional

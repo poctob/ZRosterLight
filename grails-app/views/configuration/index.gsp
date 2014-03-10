@@ -6,8 +6,41 @@
         <meta name="layout" content="main">             
         <g:set var="entityName" value="${message(code: 'configuration.label', default: 'Configuration')}" />
         <g:set var="privilegeName" value="${message(code: 'privilege.label', default: 'Privilege')}" />
-        <title><g:message code="default.list.label" args="[entityName]" /></title>      
-        
+        <title><g:message code="default.list.label" args="[entityName]" /></title>     
+
+        <script>
+            function createConfiguration()
+            {
+            <g:remoteFunction
+                controller = "configuration"
+                onSuccess = "showDialog(false, '#config-dialog-form')"             
+                action = "create"
+                update = "config-dialog-form"        
+            />
+            }
+
+            function editConfiguration(identity)
+            {
+            <g:remoteFunction
+                onSuccess = "showDialog(true, '#config-dialog-form')"             
+                action = "edit"
+                update = "config-dialog-form"
+                params = "'identity='+identity"        
+                />
+            }    
+
+            function createPrivilege()
+            {
+            <g:remoteFunction
+                controller = "privilege"
+                onSuccess = "showDialog(false, '#privilege-dialog-form')"             
+                action = "create"
+                update = "privilege-dialog-form"        
+            />
+            }
+        </script>
+
+
     </head>
     <body>
         <a href="#list-configuration" class="skip" tabindex="-1"><g:message code="default.link.skip.label" default="Skip to content&hellip;"/></a>
@@ -21,23 +54,21 @@
             <div class="message" role="status">${flash.message}</div>
         </g:if>
 
-        <div id = "config-dialog-form" title="Create New Configuration Item">           
-            <g:formRemote url="[resource:configurationInstance, action:'saveConfigurationAjax']" 
-                name="configurationSaveForm"
-                on404="alert('Error Saving Configuration!')" 
-                update="dataTableConfigDiv"
-                id="config-dialog-form-remote">
-<g:hiddenField name="version" value="${configurationInstance?.version}" />
-                <g:render template="form"/>          
-            </g:formRemote>          
-        </div>
+
+        <g:render template="editForm"/>  
+        <g:render template="editPrivilegeForm"/> 
+
 
         <div id="accordion">
             <h3><g:message code="default.list.label" args="[entityName]" /></h3>                        
 
             <div>             
                 <fieldset class="buttonsInLine">
-                    <button onclick="showDialog(false)" class="save">New</button>
+                    <a href="#"
+                    class="save"                            
+                    onclick="createConfiguration();">
+                    <g:message code="default.button.create.label" default="New" />
+                    </a>                
                 </fieldset>
                 <div id="dataTableConfigDiv">
                     <g:render template="dataTableConfig"/>
@@ -51,14 +82,22 @@
                                 <li <g:if test="${error in org.springframework.validation.FieldError}">data-field-id="${error.field}"</g:if>><g:message error="${error}"/></li>
                                 </g:eachError>
                         </ul>
-                    </g:hasErrors>
+                            </g:hasErrors>
 
                 </div>                             
             </div>
-
             <h3>Privileges</h3>
-            <div id="dataTablePrivilegeDiv">
-                <g:render template="dataTablePrivilege"/>
+            <div> 
+                <fieldset class="buttonsInLine">
+                    <a href="#"
+                    class="save"                            
+                    onclick="createPrivilege();">
+                    <g:message code="default.button.create.label" default="New" />
+                    </a>                
+                </fieldset>
+                <div id="dataTablePrivilegeDiv">
+                    <g:render template="dataTablePrivilege"/>
+                </div>
             </div>
 
         </div>

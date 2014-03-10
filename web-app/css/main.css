@@ -672,5 +672,5 @@ a.skip {
 }
 
 .buttonsInLine .save {
-    background-image: url(../images/skin/database_save.png) !important;
+    background-image: url(../images/skin/database_save.png);
 }

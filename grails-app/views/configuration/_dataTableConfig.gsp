@@ -1,29 +1,3 @@
-<script>
-    function deleteConfiguration(identity)
-    {
-    <g:remoteFunction
-        controller = "configuration"
-        action = "delete"
-        update = "dataTableConfigDiv"
-        params = "'identity='+identity"
-        />
-    }
-
-    function editConfiguration(identity)
-    {
-    <g:remoteFunction
-        controller = "configuration"
-        onSuccess = "showDialog(true)"             
-        action = "edit"
-        update = "config-dialog-form"
-        params = "'identity='+identity"        
-        />
-    }
-    
-   
-</script>
-
-
 <table>
     <thead>
         <tr>
@@ -44,13 +18,27 @@
 
                 <td>${fieldValue(bean: configurationInstance, field: "value")}</td>
 
-                <td>     
-                    <fieldset class="buttonsInLine">
-                        <button class="edit" onclick="editConfiguration(${configurationInstance.id})">Edit</button>
-                        <button class="delete" onclick="deleteConfiguration(${configurationInstance.id})">Delete</button>
-                    </fieldset>
-
-
+                <td>
+                    <g:formRemote name="configurationRemoteForm"
+                        url="[resource:configurationInstance, action:'delete']" 
+                        method="POST"
+                        update = "dataTableConfigDiv">
+                        <fieldset class="buttonsInLine">
+                            
+                            <a href="#"
+                            class="edit"                            
+                            onclick="editConfiguration(${configurationInstance.id});">
+                                <g:message code="default.button.edit.label" default="Edit" />
+                            </a>
+                            
+                            <g:actionSubmit 
+                            class="delete" 
+                            action="delete" 
+                            value="${message(code: 'default.button.delete.label', default: 'Delete')}" 
+                            onclick="return confirm('${message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');" 
+                              />
+                        </fieldset>
+                    </g:formRemote >
                 </td>
 
             </tr>
