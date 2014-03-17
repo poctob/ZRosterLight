@@ -8,7 +8,11 @@ import grails.transaction.Transactional
 @Transactional(readOnly = true)
 class ClockEventController {
 
-    static allowedMethods = [save: "POST", update: "PUT", delete: "DELETE"]
+    static allowedMethods = [
+        save: "POST", 
+        delete: "POST", 
+        saveConfigurationAjax: "POST"
+    ]
 
     def index(Integer max) {
         params.max = Math.min(max ?: 10, 100)
@@ -20,7 +24,38 @@ class ClockEventController {
     }
 
     def create() {
-        respond new ClockEvent(params)
+        def clockEventInstance = new ClockEvent(params);
+        render (template:'/configuration/editClockEventForm',  
+            model:[clockEventInstance:clockEventInstance])
+    }
+    
+    @Transactional
+    def saveConfigurationAjax(ClockEvent clockEventInstance)
+    {
+        if (clockEventInstance == null) {
+            notFound()
+            return
+        }
+        
+        clockEventInstance.save flush:true
+        
+        flash.message = "Item processed!"
+        renderConfigTable();
+        
+    }
+    
+    def renderConfigTable()
+    {
+        int lastpage = (int)(ClockEvent.count()/10)
+        lastpage*=10
+
+        params.max = 10
+        params.offset = lastpage
+        params.action = "index"
+        render (template:'/configuration/dataTableClockEvent', 
+            model:[clockEventInstanceList:ClockEvent.list(params),
+                clockEventCount: ClockEvent.count()] 
+        )
     }
 
     @Transactional
@@ -46,8 +81,16 @@ class ClockEventController {
         }
     }
 
-    def edit(ClockEvent clockEventInstance) {
-        respond clockEventInstance
+     def edit(int identity) {
+        def clockEventInstance = ClockEvent.get(identity);
+        if (clockEventInstance == null) {
+            notFound()
+            return
+        }
+        
+        render (template:'/configuration/editClockEventForm',  
+            model:[clockEventInstance:clockEventInstance])
+
     }
 
     @Transactional
@@ -73,23 +116,19 @@ class ClockEventController {
         }
     }
 
-    @Transactional
-    def delete(ClockEvent clockEventInstance) {
-
-        if (clockEventInstance == null) {
+   @Transactional
+    def delete(ClockEvent instance) {
+        
+        if (instance == null) {
             notFound()
             return
         }
 
-        clockEventInstance.delete flush:true
-
-        request.withFormat {
-            form multipartForm {
-                flash.message = message(code: 'default.deleted.message', args: [message(code: 'ClockEvent.label', default: 'ClockEvent'), clockEventInstance.id])
-                redirect action:"index", method:"GET"
-            }
-            '*'{ render status: NO_CONTENT }
-        }
+        instance.delete flush:true
+        flash.message = message(code: 'default.deleted.message', 
+            args: [message(code: 'ClockEvent.label', 
+                default: 'ClockEvent'), instance.name])
+        renderConfigTable();     
     }
 
     protected void notFound() {

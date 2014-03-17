@@ -53,8 +53,8 @@ class PrivilegeController {
     }
 
     def create() {
-       def privilegeInstance = new Privilege(params);
-       render (template:'/configuration/editPrivilegeForm',  
+        def privilegeInstance = new Privilege(params);
+        render (template:'/configuration/editPrivilegeForm',  
             model:[privilegeInstance:privilegeInstance])
     }
 
@@ -81,8 +81,16 @@ class PrivilegeController {
         }
     }
 
-    def edit(Privilege privilegeInstance) {
-        respond privilegeInstance
+    def edit(int identity) {
+        def privilegeInstance = Privilege.get(identity);
+        if (privilegeInstance == null) {
+            notFound()
+            return
+        }
+        
+        render (template:'/configuration/editPrivilegeForm',  
+            model:[privilegeInstance:privilegeInstance])
+
     }
 
     @Transactional
@@ -109,22 +117,18 @@ class PrivilegeController {
     }
 
     @Transactional
-    def delete(Privilege privilegeInstance) {
-
-        if (privilegeInstance == null) {
+    def delete(Privilege instance) {
+        
+        if (instance == null) {
             notFound()
             return
         }
 
-        privilegeInstance.delete flush:true
-
-        request.withFormat {
-            form multipartForm {
-                flash.message = message(code: 'default.deleted.message', args: [message(code: 'Privilege.label', default: 'Privilege'), privilegeInstance.id])
-                redirect action:"index", method:"GET"
-            }
-            '*'{ render status: NO_CONTENT }
-        }
+        instance.delete flush:true
+        flash.message = message(code: 'default.deleted.message', 
+            args: [message(code: 'Privilege.label', 
+                default: 'Privilege'), instance.name])
+        renderConfigTable();     
     }
 
     protected void notFound() {

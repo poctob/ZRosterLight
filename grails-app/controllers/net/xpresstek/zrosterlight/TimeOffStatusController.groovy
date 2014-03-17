@@ -8,7 +8,11 @@ import grails.transaction.Transactional
 @Transactional(readOnly = true)
 class TimeOffStatusController {
 
-    static allowedMethods = [save: "POST", update: "PUT", delete: "DELETE"]
+     static allowedMethods = [
+        save: "POST", 
+        delete: "POST", 
+        saveConfigurationAjax: "POST"
+    ]
 
     def index(Integer max) {
         params.max = Math.min(max ?: 10, 100)
@@ -20,7 +24,38 @@ class TimeOffStatusController {
     }
 
     def create() {
-        respond new TimeOffStatus(params)
+        def timeOffStatus = new TimeOffStatus(params);
+        render (template:'/configuration/editTimeOffStatusForm',  
+            model:[timeOffStatus:timeOffStatus])
+    }
+    
+     @Transactional
+    def saveConfigurationAjax(TimeOffStatus timeOffStatus)
+    {
+        if (timeOffStatus == null) {
+            notFound()
+            return
+        }
+        
+        timeOffStatus.save flush:true
+        
+        flash.message = "Item processed!"
+        renderConfigTable();
+        
+    }
+    
+    def renderConfigTable()
+    {
+        int lastpage = (int)(TimeOffStatus.count()/10)
+        lastpage*=10
+
+        params.max = 10
+        params.offset = lastpage
+        params.action = "index"
+        render (template:'/configuration/dataTableTimeOffStatus', 
+            model:[timeOffStatusInstanceList:TimeOffStatus.list(params),
+                timeOffStatusCount: TimeOffStatus.count()] 
+        )
     }
 
     @Transactional
@@ -46,9 +81,18 @@ class TimeOffStatusController {
         }
     }
 
-    def edit(TimeOffStatus timeOffStatusInstance) {
-        respond timeOffStatusInstance
+    def edit(int identity) {
+        def timeOffStatusInstance = TimeOffStatus.get(identity);
+        if (timeOffStatusInstance == null) {
+            notFound()
+            return
+        }
+        
+        render (template:'/configuration/editTimeOffStatusForm',  
+            model:[timeOffStatusInstance:timeOffStatusInstance])
+
     }
+
 
     @Transactional
     def update(TimeOffStatus timeOffStatusInstance) {
@@ -74,22 +118,18 @@ class TimeOffStatusController {
     }
 
     @Transactional
-    def delete(TimeOffStatus timeOffStatusInstance) {
-
-        if (timeOffStatusInstance == null) {
+    def delete(TimeOffStatus instance) {
+        
+        if (instance == null) {
             notFound()
             return
         }
 
-        timeOffStatusInstance.delete flush:true
-
-        request.withFormat {
-            form multipartForm {
-                flash.message = message(code: 'default.deleted.message', args: [message(code: 'TimeOffStatus.label', default: 'TimeOffStatus'), timeOffStatusInstance.id])
-                redirect action:"index", method:"GET"
-            }
-            '*'{ render status: NO_CONTENT }
-        }
+        instance.delete flush:true
+        flash.message = message(code: 'default.deleted.message', 
+            args: [message(code: 'TimeOffStatus.label', 
+                default: 'TimeOffStatus'), instance.name])
+        renderConfigTable()
     }
 
     protected void notFound() {

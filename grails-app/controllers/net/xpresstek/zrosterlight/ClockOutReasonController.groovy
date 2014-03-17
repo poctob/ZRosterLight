@@ -8,7 +8,11 @@ import grails.transaction.Transactional
 @Transactional(readOnly = true)
 class ClockOutReasonController {
 
-    static allowedMethods = [save: "POST", update: "PUT", delete: "DELETE"]
+      static allowedMethods = [
+        save: "POST", 
+        delete: "POST", 
+        saveConfigurationAjax: "POST"
+    ]
 
     def index(Integer max) {
         params.max = Math.min(max ?: 10, 100)
@@ -19,8 +23,39 @@ class ClockOutReasonController {
         respond clockOutReasonInstance
     }
 
-    def create() {
-        respond new ClockOutReason(params)
+     def create() {
+        def clockOutReasonInstance = new ClockOutReason(params);
+        render (template:'/configuration/editClockOutReasonForm',  
+            model:[clockOutReasonInstance:clockOutReasonInstance])
+    }
+    
+    @Transactional
+    def saveConfigurationAjax(ClockOutReason clockOutReasonInstance)
+    {
+        if (clockOutReasonInstance == null) {
+            notFound()
+            return
+        }
+        
+        clockOutReasonInstance.save flush:true
+        
+        flash.message = "Item processed!"
+        renderConfigTable();
+        
+    }
+    
+    def renderConfigTable()
+    {
+        int lastpage = (int)(ClockOutReason.count()/10)
+        lastpage*=10
+
+        params.max = 10
+        params.offset = lastpage
+        params.action = "index"
+        render (template:'/configuration/dataTableClockOutReason', 
+            model:[clockOutReasonInstanceList:ClockOutReason.list(params),
+                clockOutReasonCount: ClockOutReason.count()] 
+        )
     }
 
     @Transactional
@@ -46,8 +81,16 @@ class ClockOutReasonController {
         }
     }
 
-    def edit(ClockOutReason clockOutReasonInstance) {
-        respond clockOutReasonInstance
+     def edit(int identity) {
+        def clockOutReasonInstance = ClockOutReason.get(identity);
+        if (clockOutReasonInstance == null) {
+            notFound()
+            return
+        }
+        
+        render (template:'/configuration/editClockOutReasonForm',  
+            model:[clockOutReasonInstance:clockOutReasonInstance])
+
     }
 
     @Transactional
@@ -74,22 +117,18 @@ class ClockOutReasonController {
     }
 
     @Transactional
-    def delete(ClockOutReason clockOutReasonInstance) {
-
-        if (clockOutReasonInstance == null) {
+    def delete(ClockOutReason instance) {
+        
+        if (instance == null) {
             notFound()
             return
         }
 
-        clockOutReasonInstance.delete flush:true
-
-        request.withFormat {
-            form multipartForm {
-                flash.message = message(code: 'default.deleted.message', args: [message(code: 'ClockOutReason.label', default: 'ClockOutReason'), clockOutReasonInstance.id])
-                redirect action:"index", method:"GET"
-            }
-            '*'{ render status: NO_CONTENT }
-        }
+        instance.delete flush:true
+        flash.message = message(code: 'default.deleted.message', 
+            args: [message(code: 'ClockOutReason.label', 
+                default: 'ClockOutReason'), instance.name])
+        renderConfigTable();     
     }
 
     protected void notFound() {

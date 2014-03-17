@@ -8,7 +8,11 @@ import grails.transaction.Transactional
 @Transactional(readOnly = true)
 class PositionController {
 
-    static allowedMethods = [save: "POST", update: "PUT", delete: "DELETE"]
+     static allowedMethods = [
+        save: "POST", 
+        delete: "POST", 
+        saveConfigurationAjax: "POST"
+    ]
 
     def index(Integer max) {
         params.max = Math.min(max ?: 10, 100)
@@ -20,7 +24,38 @@ class PositionController {
     }
 
     def create() {
-        respond new Position(params)
+       def positionInstance = new Position(params);
+       render (template:'/configuration/editPositionForm',  
+            model:[positionInstance:positionInstance])
+    }
+    
+     @Transactional
+    def saveConfigurationAjax(Position positionInstance)
+    {
+        if (positionInstance == null) {
+            notFound()
+            return
+        }
+        
+        positionInstance.save flush:true
+        
+        flash.message = "Item processed!"
+        renderConfigTable();
+        
+    }
+    
+    def renderConfigTable()
+    {
+        int lastpage = (int)(Position.count()/10)
+        lastpage*=10
+
+        params.max = 10
+        params.offset = lastpage
+        params.action = "index"
+        render (template:'/configuration/dataTablePosition', 
+            model:[positionInstanceList:Position.list(params),
+                positionInstanceCount: Position.count()] 
+        )
     }
 
     @Transactional
@@ -46,8 +81,16 @@ class PositionController {
         }
     }
 
-    def edit(Position positionInstance) {
-        respond positionInstance
+     def edit(int identity) {
+        def positionInstance = Position.get(identity);
+        if (positionInstance == null) {
+            notFound()
+            return
+        }
+        
+        render (template:'/configuration/editPositionForm',  
+            model:[positionInstance:positionInstance])
+
     }
 
     @Transactional
@@ -73,23 +116,19 @@ class PositionController {
         }
     }
 
-    @Transactional
-    def delete(Position positionInstance) {
-
-        if (positionInstance == null) {
+   @Transactional
+    def delete(Position instance) {
+        
+        if (instance == null) {
             notFound()
             return
         }
 
-        positionInstance.delete flush:true
-
-        request.withFormat {
-            form multipartForm {
-                flash.message = message(code: 'default.deleted.message', args: [message(code: 'Position.label', default: 'Position'), positionInstance.id])
-                redirect action:"index", method:"GET"
-            }
-            '*'{ render status: NO_CONTENT }
-        }
+        instance.delete flush:true
+        flash.message = message(code: 'default.deleted.message', 
+            args: [message(code: 'Position.label', 
+                default: 'Position'), instance.name])
+        renderConfigTable();     
     }
 
     protected void notFound() {
