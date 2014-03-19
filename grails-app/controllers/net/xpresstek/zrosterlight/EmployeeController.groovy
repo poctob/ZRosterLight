@@ -8,88 +8,82 @@ import grails.transaction.Transactional
 @Transactional(readOnly = true)
 class EmployeeController {
 
-    static allowedMethods = [save: "POST", update: "PUT", delete: "DELETE"]
+    static allowedMethods = [
+        save: "POST", 
+        delete: "POST"
+    ]
 
     def index(Integer max) {
-        params.max = Math.min(max ?: 10, 100)
-        respond Employee.list(params), model:[employeeInstanceCount: Employee.count()]
+        params.max = Math.min(max ?: 5, 100)
+        render( view: "index",  
+            model:[
+                employeeInstanceList: Employee.list(params),
+                employeeInstanceCount: Employee.count(),
+            ])           
     }
-
-    def show(Employee employeeInstance) {
-        respond employeeInstance
-    }
-
-    def create() {
-        respond new Employee(params)
-    }
-
+    
     @Transactional
-    def save(Employee employeeInstance) {
+    def save(Employee employeeInstance)
+    {
         if (employeeInstance == null) {
             notFound()
             return
         }
-
-        if (employeeInstance.hasErrors()) {
-            respond employeeInstance.errors, view:'create'
-            return
-        }
-
+        
         employeeInstance.save flush:true
+        
+        flash.message = "Item processed!"
+        renderTable();
+        
+    }
+    
+    def renderTable()
+    {
+        int lastpage = (int)(Employee.count()/10)
+        lastpage*=10
 
-        request.withFormat {
-            form multipartForm {
-                flash.message = message(code: 'default.created.message', args: [message(code: 'employeeInstance.label', default: 'Employee'), employeeInstance.id])
-                redirect employeeInstance
-            }
-            '*' { respond employeeInstance, [status: CREATED] }
-        }
+        params.max = 10
+        params.offset = lastpage
+        params.action = "index"
+        render (template:'dataTableEmployee', 
+            model:[employeeInstanceList:Employee.list(params),
+                employeeInstanceCount: Employee.count()] 
+        )
     }
 
-    def edit(Employee employeeInstance) {
-        respond employeeInstance
+    def create()
+    {
+        def employeeInstance = new Employee(params)
+        render (template:'editForm',  
+            model:[employeeInstance:employeeInstance])
     }
-
-    @Transactional
-    def update(Employee employeeInstance) {
+    
+    def edit(int identity) {
+        def employeeInstance = Employee.get(identity);
         if (employeeInstance == null) {
             notFound()
             return
         }
+        
+        render (template:'editForm',  
+            model:[employeeInstance:employeeInstance])
 
-        if (employeeInstance.hasErrors()) {
-            respond employeeInstance.errors, view:'edit'
-            return
-        }
-
-        employeeInstance.save flush:true
-
-        request.withFormat {
-            form multipartForm {
-                flash.message = message(code: 'default.updated.message', args: [message(code: 'Employee.label', default: 'Employee'), employeeInstance.id])
-                redirect employeeInstance
-            }
-            '*'{ respond employeeInstance, [status: OK] }
-        }
     }
-
+   
     @Transactional
-    def delete(Employee employeeInstance) {
-
-        if (employeeInstance == null) {
+    def delete(Employee instance) {
+        
+        if (instance == null) {
             notFound()
             return
         }
 
-        employeeInstance.delete flush:true
-
-        request.withFormat {
-            form multipartForm {
-                flash.message = message(code: 'default.deleted.message', args: [message(code: 'Employee.label', default: 'Employee'), employeeInstance.id])
-                redirect action:"index", method:"GET"
-            }
-            '*'{ render status: NO_CONTENT }
-        }
+        instance.delete flush:true
+        flash.message = message(code: 'default.deleted.message', 
+            args: [message(code: 'Employee.label', 
+                default: 'Employee'), instance.name])
+        renderTable();
+     
     }
 
     protected void notFound() {

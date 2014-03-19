@@ -11,88 +11,50 @@ abstract class BaseController <ObjectType>{
         saveConfigurationAjax: "POST"
     ]
     
-    def dataTableName
     def editFormName
+    def dataTableName
     
-    abstract index();
-    
-    abstract ObjectType getNewObject()
-    abstract ObjectType getByID(int id)
-    abstract ObjectType castToObject(Object instance)
+    abstract count()
+    abstract list(params)
+    abstract get(identity)
+    abstract delete(ObjectType instance)
+    abstract saveConfigurationAjax(ObjectType instance)
     
     def create()
     {
-       def instance = getNewObject();
-       render (template:editFormName,  
+        def instance = new ObjectType();
+        render (template:editFormName,  
             model:[instance:instance])
     }
     
-    @Transactional
-    def saveConfigurationAjax(ObjectType instance)
-    {
-        def obj = castToObject(instance)
-        if (obj == null) {
-            notFound()
-            return
-        }
-        
-        obj.save flush:true
-        
-        flash.message = "Item processed!"
-        renderTable();
-        
-    }       
+    def show(ObjectType instance) {
+        respond instance
+    }
     
-    def renderTable()
+    def renderConfigTable()
     {
-        int lastpage = (int)(ObjectType.count()/10)
+        int lastpage = (int)(count()/10)
         lastpage*=10
 
         params.max = 10
         params.offset = lastpage
         params.action = "index"
-        render (template: dataTableName, 
-            model:[instanceList:ObjectType.list(params),
-                instanceCount: ObjectType.count()] 
+        render (template:dataTableName, 
+            model:[instanceList:list(params),
+                instanceCount: count()] 
         )
     }
     
-    def edit(int identity) {
-        def instance = getByID(identity);
+     def edit(int identity) {
+        def instance = get(identity);
         if (instance == null) {
             notFound()
             return
         }
         
-        render (template: editFormName,  
+        render (template:editFormName,  
             model:[instance:instance])
 
-    }      
-    
-
-    @Transactional
-    def delete(ObjectType instance) {
-
-        if (instance == null) {
-            notFound()
-            return
-        }
-
-        instance.delete flush:true
-        flash.message = message(code: 'default.deleted.message', 
-            args: [message(code: 'ObjectType.label', 
-                default: 'ObjectType'), instance.name])
-        renderTable();
-     
     }
-
-    protected void notFound() {
-        request.withFormat {
-            form multipartForm {
-                flash.message = message(code: 'default.not.found.message', args: [message(code: 'instance.label', default: 'ObjectType'), params.id])
-                redirect action: "index", method: "GET"
-            }
-            '*'{ render status: NOT_FOUND }
-        }
-    }
+        
 }

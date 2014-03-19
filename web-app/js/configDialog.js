@@ -15,6 +15,7 @@ $(function() {
   setupEditDialog(true,"#clockevent-dialog-form");
   setupEditDialog(true,"#clockoutreason-dialog-form");
   setupEditDialog(true,"#timeoffstatus-dialog-form");
+  setupEditDialog(true,"#employee-dialog-form");
 });
 
 /**
