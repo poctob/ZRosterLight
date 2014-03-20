@@ -6,4 +6,7 @@ class Position {
     String comment
     
     static hasMany = [shift : Shift]
+    static constraints  = {
+        comment (nullable:true)
+    }
 }

@@ -29,13 +29,13 @@ class EmployeeController {
             notFound()
             return
         }
-        
         employeeInstance.save flush:true
         
-        flash.message = "Item processed!"
-        renderTable();
-        
+        flash.message = "Item processed!" + employeeInstance.password
+        renderTable();  
     }
+    
+   
     
     def renderTable()
     {
@@ -46,7 +46,7 @@ class EmployeeController {
         params.offset = lastpage
         params.action = "index"
         render (template:'dataTableEmployee', 
-            model:[employeeInstanceList:Employee.list(params),
+            model:[employeeInstanceList: Employee.list(params),
                 employeeInstanceCount: Employee.count()] 
         )
     }
